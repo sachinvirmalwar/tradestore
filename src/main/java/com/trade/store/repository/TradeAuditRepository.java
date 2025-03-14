@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.trade.store.model.TradeAudit;
 
-public interface TradeAuditRepository extends MongoRepository<TradeAudit, Long> {
+public interface TradeAuditRepository extends MongoRepository<TradeAudit, String> {
     List<TradeAudit> findByTradeId(String tradeId);
 }
