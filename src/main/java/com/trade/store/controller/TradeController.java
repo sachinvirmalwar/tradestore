@@ -11,8 +11,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/trades")
 public class TradeController {
-	@Autowired
+	
 	private TradeService ts; 
+	
+	@Autowired
+	public void setTradeService(TradeService ts) {
+		this.ts = ts;
+	}
+	
     private final KafkaTemplate<String, Trade> kafkaTemplate;
 
     public TradeController(KafkaTemplate<String, Trade> kafkaTemplate) {
