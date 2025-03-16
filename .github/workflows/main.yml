@@ -17,9 +17,9 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: tradestore
+          POSTGRES_USER: postgress
+          POSTGRES_PASSWORD: Manudi@08
+          POSTGRES_DB: storeDB
         ports:
           - 5432:5432
 
