@@ -26,7 +26,7 @@ public class TradeService {
     
 
     @KafkaListener(topics = "trade-store-topic", groupId = "trade-group")
-    public void processTrade(Trade trade) {
+    public Trade processTrade(Trade trade) {
         Optional<Trade> existingTrades = tradeRepository.findByTradeId(trade.getTradeId());
 
         existingTrades.stream().max((t1, t2) -> Integer.compare(t1.getVersion(), t2.getVersion()))
@@ -45,6 +45,7 @@ public class TradeService {
         		trade.getMaturityDate(), 
         		LocalDate.now(),
         		"CREATED"));
+    return trade;
     }
 
     @Scheduled(cron = "0 0 0 * * ?")

@@ -22,7 +22,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
   datasource:
-    url: jdbc:postgresql://localhost:5432/tradeDB
+    url: jdbc:postgresql://localhost:5432/storeDB
     username: postgres
     password: Manudi@08
     driverClassName: org.postgresql.Driver

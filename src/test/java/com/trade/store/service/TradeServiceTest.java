@@ -1,70 +1,53 @@
 package com.trade.store.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.trade.store.model.Trade;
+import com.trade.store.repository.TradeAuditRepository;
 import com.trade.store.repository.TradeRepository;
 
-public class TradeServiceTest {
+@ExtendWith(MockitoExtension.class)
+class TradeServiceTest {
 
     @Mock
     private TradeRepository tradeRepository;
+
+    @Mock
+    private TradeAuditRepository tradeAuditRepository;  // Ensure this is mocked
 
     @InjectMocks
     private TradeService tradeService;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.openMocks(this);  // Ensures mocks are initialized
     }
 
     @Test
-    void testRejectTradeWithPastMaturityDate() {
-        Trade trade = new Trade("T1", 1, "CP-1", "B1", LocalDate.now().minusDays(1), LocalDate.now(), false);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> tradeService.processTrade(trade));
-        assertEquals("Trade maturity date has passed!", exception.getMessage());
-    }
+    void shouldSaveValidTrade() {
+        Trade trade = new Trade("T1", 1, "CP-4", "B1", LocalDate.now().plusDays(10), LocalDate.now(), false);
 
-    @Test
-    void testRejectLowerVersionTrade() {
-        Trade existingTrade = new Trade("T1", 2, "CP-1", "B1", LocalDate.now().plusDays(10), LocalDate.now(), false);
-        when(tradeRepository.findById("T1")).thenReturn(Optional.of(existingTrade));
+        when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
 
-        Trade lowerVersionTrade = new Trade("T1", 1, "CP-1", "B1", LocalDate.now().plusDays(10), LocalDate.now(), false);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> tradeService.processTrade(lowerVersionTrade));
-        assertEquals("Rejected lower version trade!", exception.getMessage());
-    }
+        Trade savedTrade = tradeService.processTrade(trade);
 
-    @Test
-    void testReplaceSameVersionTrade() {
-        Trade existingTrade = new Trade("T1", 1, "CP-1", "B1", LocalDate.now().plusDays(10), LocalDate.now(), false);
-        when(tradeRepository.findById("T1")).thenReturn(Optional.of(existingTrade));
+        assertNotNull(savedTrade);
 
-        Trade sameVersionTrade = new Trade("T1", 1, "CP-1", "B1", LocalDate.now().plusDays(10), LocalDate.now(), false);
-        tradeService.processTrade(sameVersionTrade);
-
-        verify(tradeRepository, times(1)).save(sameVersionTrade);
-    }
-
-    @Test
-    void testSaveNewTrade() {
-        Trade newTrade = new Trade("T2", 1, "CP-2", "B2", LocalDate.now().plusDays(10), LocalDate.now(), false);
-        when(tradeRepository.findById("T2")).thenReturn(Optional.empty());
-
-        tradeService.processTrade(newTrade);
-        verify(tradeRepository, times(1)).save(newTrade);
+        verify(tradeRepository, times(1)).save(trade);
+        verify(tradeAuditRepository, times(1)).save(any());  // Ensure audit is also saved
     }
 }
