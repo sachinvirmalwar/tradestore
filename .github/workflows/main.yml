@@ -17,7 +17,11 @@ jobs:
       postgres:
         image: postgres:latest
         env:
+<<<<<<< HEAD
           POSTGRES_USER: postgres
+=======
+          POSTGRES_USER: postgress
+>>>>>>> 9f4faa5c4f6947574419de50fa5e9c5e43ec4f12
           POSTGRES_PASSWORD: Manudi@08
           POSTGRES_DB: storeDB
         ports:
